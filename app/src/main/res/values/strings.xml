@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">Lab3</string>
+    <string name="first_activity">First Activity</string>
+    <string name="input_text_hint">Input Text</string>
+    <string name="submitBtn">Submit</string>
+    <string name="second_activity">Second Activity</string>
 </resources>
