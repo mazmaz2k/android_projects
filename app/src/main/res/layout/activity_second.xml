@@ -19,7 +19,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:textSize="15pt"/>
+        android:textSize="10pt"/>
 
     <TextView
         android:id="@+id/secondActivity"
@@ -34,7 +34,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:textSize="15pt"/>
+        android:textSize="10pt"/>
 
     <Button
         android:id="@+id/speakBtn"

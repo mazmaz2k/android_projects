@@ -6,7 +6,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
 
 import java.util.Locale;
@@ -16,11 +15,15 @@ public class secondActivity extends AppCompatActivity {
     TextView txt2;
     Button spkBtn;
     TextToSpeech txtSpeach;
+    boolean isOnPlay;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_second);
+
+        isOnPlay = false;
+
         Intent i = getIntent();
         String str = i.getStringExtra("key");
         spkBtn = (Button) findViewById(R.id.speakBtn);
@@ -39,7 +42,14 @@ public class secondActivity extends AppCompatActivity {
         spkBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                txtSpeach.speak(txt2.getText().toString(), TextToSpeech.QUEUE_FLUSH, null);
+                if(!isOnPlay) {
+                    txtSpeach.speak(txt2.getText().toString(), TextToSpeech.QUEUE_FLUSH, null);
+                    isOnPlay = true;
+                }
+                else {
+                    isOnPlay = false;
+                    txtSpeach.stop();
+                }
             }
         });
     }
