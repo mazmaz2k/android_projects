@@ -5,6 +5,6 @@
     <string name="submitBtn">Submit</string>
     <string name="second_activity">Second Activity</string>
     <string name="sentence_second_activity">The Sentence</string>
-    <string name="second_activity">Second Activity</string>
     <string name="speakBtn">Speak</string>
+    <string name="second_actv">Second Activity</string>
 </resources>
