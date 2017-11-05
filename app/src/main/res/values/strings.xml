@@ -4,4 +4,7 @@
     <string name="input_text_hint">Input Text</string>
     <string name="submitBtn">Submit</string>
     <string name="second_activity">Second Activity</string>
+    <string name="sentence_second_activity">The Sentence</string>
+    <string name="second_activity">Second Activity</string>
+    <string name="speakBtn">Speak</string>
 </resources>
