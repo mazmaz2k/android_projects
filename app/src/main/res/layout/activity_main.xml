@@ -3,6 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mainLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.example.alex.ex1.MainActivity">
@@ -19,7 +20,8 @@
         app:layout_constraintBottom_toTopOf="@+id/linearLayout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        android:countDown="true"/>
 
     <LinearLayout
         android:id="@+id/linearLayout"
@@ -39,23 +41,25 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <TextView
-            android:id="@+id/exerciseText"
+            android:id="@+id/exerciseTxt"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/temp_exercise"
             android:textSize="20sp" />
 
         <EditText
-            android:id="@+id/editAnswer"
+            android:id="@+id/answerEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
-            android:hint="@string/answer"/>
+            android:hint="@string/answer"
+            android:inputType="number"
+            android:maxLength="9"/>
 
     </LinearLayout>
 
     <TextView
-        android:id="@+id/totalRightAnswers"
+        android:id="@+id/totalRightAnswersTxt"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
