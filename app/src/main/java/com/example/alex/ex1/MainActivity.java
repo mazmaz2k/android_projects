@@ -1,11 +1,14 @@
 package com.example.alex.ex1;
 
+import android.content.Intent;
+import android.graphics.Color;
 import android.os.SystemClock;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.ViewGroup;
 import android.widget.Chronometer;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -17,7 +20,8 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, Chro
     public static final long START_VALUE_SEC = 60;  // 60 seconds.
     public static final long YELLOW_ALERT_VAL = 30; // 30 seconds.
     public static final long RED_ALERT_VAL = 10; // 10 seconds.
-    
+
+    private ViewGroup layout;
     private Chronometer chronometer;
     private TextView txtExercise, txtTotalRightAnswers;
     private EditText editTxt;
@@ -31,6 +35,7 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, Chro
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        layout = findViewById(R.id.mainLayout);
         chronometer = findViewById(R.id.chronometer);
         txtExercise = findViewById(R.id.exerciseTxt);
         txtTotalRightAnswers = findViewById(R.id.totalRightAnswersTxt);
@@ -94,22 +99,23 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, Chro
 
     @Override
     public void onChronometerTick(Chronometer chronometer) {
-        Log.d("temp", SystemClock.elapsedRealtime() - chronometer.getBase() + "");
         if(SystemClock.elapsedRealtime() - chronometer.getBase() > 0) {
             gameOver();
         } else if(SystemClock.elapsedRealtime() - chronometer.getBase() > -RED_ALERT_VAL * 1000) {
-            Log.d("temp", "BACKGROUND RED");
+            changeScreenColor(Color.RED);
         } else if(SystemClock.elapsedRealtime() - chronometer.getBase() > -YELLOW_ALERT_VAL * 1000){
-            Log.d("temp", "BACKGROUND YELLOW");
+            changeScreenColor(Color.YELLOW);
 
         }
     }
 
     private void changeScreenColor(int color) {
-
+        layout.setBackgroundColor(color);
     }
 
     private void gameOver() {
-
+        chronometer.stop();
+        Intent intent = new Intent(MainActivity.this, Highscore.class);
+        startActivity(intent);
     }
 }
