@@ -34,6 +34,7 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, Chro
     private Random rand;
     private int rightAnswer;
     private int totalRightAnswers;
+    private long chronometer_saved_time;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +53,7 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, Chro
         rand = new Random();
 
         rightAnswer = 0;
+        chronometer_saved_time = 0;
         totalRightAnswers = 0;
         exerciseString = "";
 
@@ -100,19 +102,25 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, Chro
     @Override
     protected void onPause() {
         super.onPause();
+        chronometer_saved_time = SystemClock.elapsedRealtime() - chronometer.getBase();        // Update the time left when the activity goes onPause().
         chronometer.stop();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        if(chronometer_saved_time != 0) {    // If not the first application run.
+            chronometer.setBase(SystemClock.elapsedRealtime() - chronometer_saved_time);     // Set last time before leave the activity.
+        }
         chronometer.start();
     }
 
     @Override
     protected void onRestart() {
         super.onRestart();
-        restart();
+        if(chronometer_saved_time > 0) {
+            restart();
+        }
     }
 
     @Override
@@ -157,6 +165,7 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, Chro
     private void restart() {
         changeScreenColor(Color.TRANSPARENT);
         totalRightAnswers = 0;
+        chronometer_saved_time = 0;
         rightAnswer = 0;
         initChronometer();
         setExercise();
