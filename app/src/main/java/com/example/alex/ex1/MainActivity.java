@@ -14,11 +14,11 @@ import android.widget.Chronometer;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Random;
+import java.util.TimeZone;
 
 public class MainActivity extends AppCompatActivity implements TextWatcher, Chronometer.OnChronometerTickListener, View.OnClickListener{
 
@@ -110,6 +110,12 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, Chro
     }
 
     @Override
+    protected void onRestart() {
+        super.onRestart();
+        restart();
+    }
+
+    @Override
     public void onChronometerTick(Chronometer chronometer) {
         if(SystemClock.elapsedRealtime() - chronometer.getBase() > 0) {
             gameOver();
@@ -128,12 +134,12 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, Chro
     private void gameOver() {
         chronometer.stop();
         SimpleDateFormat date = new SimpleDateFormat("dd/MM/YYYY 'at' hh:mm:ss", Locale.US);
+        date.setTimeZone(TimeZone.getDefault());
         String strDate = date.format(new Date(System.currentTimeMillis()));
         Intent intent = new Intent(MainActivity.this, Highscore.class);
         intent.putExtra("date", strDate);
         intent.putExtra("score", totalRightAnswers);
         startActivity(intent);
-        finish();
     }
 
     @Override
@@ -146,5 +152,14 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, Chro
                 Toast.makeText(MainActivity.this, "Sorry, youtube application not found.", Toast.LENGTH_SHORT).show();
             }
         }
+    }
+
+    private void restart() {
+        changeScreenColor(Color.TRANSPARENT);
+        totalRightAnswers = 0;
+        rightAnswer = 0;
+        initChronometer();
+        setExercise();
+        updateView(totalRightAnswers);
     }
 }
