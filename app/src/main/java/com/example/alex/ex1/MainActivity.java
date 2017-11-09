@@ -2,20 +2,25 @@ package com.example.alex.ex1;
 
 import android.content.Intent;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.SystemClock;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Chronometer;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 import java.util.Random;
 
-public class MainActivity extends AppCompatActivity implements TextWatcher, Chronometer.OnChronometerTickListener{
+public class MainActivity extends AppCompatActivity implements TextWatcher, Chronometer.OnChronometerTickListener, View.OnClickListener{
 
     public static final long START_VALUE_SEC = 60;  // 60 seconds.
     public static final long YELLOW_ALERT_VAL = 30; // 30 seconds.
@@ -43,6 +48,7 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, Chro
 
         editTxt.addTextChangedListener(this);
         chronometer.setOnChronometerTickListener(this);
+        txtTotalRightAnswers.setOnClickListener(this);
         rand = new Random();
 
         rightAnswer = 0;
@@ -98,6 +104,12 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, Chro
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        chronometer.start();
+    }
+
+    @Override
     public void onChronometerTick(Chronometer chronometer) {
         if(SystemClock.elapsedRealtime() - chronometer.getBase() > 0) {
             gameOver();
@@ -115,7 +127,24 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, Chro
 
     private void gameOver() {
         chronometer.stop();
+        SimpleDateFormat date = new SimpleDateFormat("dd/MM/YYYY 'at' hh:mm:ss", Locale.US);
+        String strDate = date.format(new Date(System.currentTimeMillis()));
         Intent intent = new Intent(MainActivity.this, Highscore.class);
+        intent.putExtra("date", strDate);
+        intent.putExtra("score", totalRightAnswers);
         startActivity(intent);
+        finish();
+    }
+
+    @Override
+    public void onClick(View v) {
+        if(v.getId() == R.id.totalRightAnswersTxt) {
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:9jK-NcRmVcw"));
+            if(intent.resolveActivity(getPackageManager()) != null) {
+                startActivity(intent);
+            } else {
+                Toast.makeText(MainActivity.this, "Sorry, youtube application not found.", Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 }
