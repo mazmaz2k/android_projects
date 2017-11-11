@@ -35,6 +35,8 @@ public class Highscore extends AppCompatActivity {
         db.insert(DBHelper.TABLE_NAME, null, values);
 
         readFromDB(db);
+
+        db.close();
     }
 
     private void readFromDB(SQLiteDatabase db) {
