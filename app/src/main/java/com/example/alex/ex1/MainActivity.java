@@ -164,6 +164,7 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, Chro
 
     private void restart() {
         changeScreenColor(Color.TRANSPARENT);
+        editTxt.setText("");
         totalRightAnswers = 0;
         chronometer_saved_time = 0;
         rightAnswer = 0;
