@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">Lab4</string>
+    <string name="course_name">Course Name</string>
+    <string name="course_name">Course Name</string>
+    <string name="course_grade">Course Grade</string>
+    <string name="course_id">Course ID</string>
+    <string name="submit_btn">submit</string>
 </resources>
