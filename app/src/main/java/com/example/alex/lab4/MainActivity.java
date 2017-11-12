@@ -49,8 +49,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void getData() {
         Cursor c = this.db.query(Constants.Course.TABLE_NAME, new String[] {Constants.Course.COURSE_NAME +" ,MAX(" + Constants.Course.COURSE_GRADE +")"+ ", AVG(" + Constants.Course.COURSE_GRADE + ")"}, null, null,null,null, null);   // Select * From table
         c.moveToFirst();
-        best_course.setText("Best Course Is: " + c.getString(0) + "\nGrade is :" + c.getInt(1));
-        avarage.setText("The Avarage Is: " + c.getString(2));
+       if(c.isNull(0)){
+            best_course.setText("NO Courses!! \n Please enter values" );
+           // avarage.setText("The Avarage Is: " + c.getString(2));
+        }else {
+            best_course.setText("Best Course Is: " + c.getString(0) + "\nGrade is :" + c.getInt(1));
+            avarage.setText("The Avarage Is: " + c.getString(2));
+        }
+
         c.close();
     }
 
