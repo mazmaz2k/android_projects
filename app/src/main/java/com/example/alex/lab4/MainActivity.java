@@ -39,15 +39,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void insertIntoTable(int id, String name, int grade) {
         ContentValues cv = new ContentValues();
-        cv.put(DBHelper.Course.COURSE_ID, id);
-        cv.put(DBHelper.Course.COURSE_NAME, name);
-        cv.put(DBHelper.Course.COURSE_GRADE, grade);
+        cv.put(Constants.Course.COURSE_ID, id);
+        cv.put(Constants.Course.COURSE_NAME, name);
+        cv.put(Constants.Course.COURSE_GRADE, grade);
 
-        this.db.insert(DBHelper.Course.TABLE_NAME,null, cv);
+        this.db.insert(Constants.Course.TABLE_NAME,null, cv);
     }
 
     private void getData() {
-        Cursor c = this.db.query(DBHelper.Course.TABLE_NAME, new String[] {DBHelper.Course.COURSE_NAME +" ,MAX(" + DBHelper.Course.COURSE_GRADE +")"+ ", AVG(" + DBHelper.Course.COURSE_GRADE + ")"}, null, null,null,null, null);   // Select * From table
+        Cursor c = this.db.query(Constants.Course.TABLE_NAME, new String[] {Constants.Course.COURSE_NAME +" ,MAX(" + Constants.Course.COURSE_GRADE +")"+ ", AVG(" + Constants.Course.COURSE_GRADE + ")"}, null, null,null,null, null);   // Select * From table
         c.moveToFirst();
         best_course.setText("Best Course Is: " + c.getString(0) + "\nGrade is :" + c.getInt(1));
         avarage.setText("The Avarage Is: " + c.getString(2));
