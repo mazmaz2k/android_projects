@@ -33,6 +33,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         best_course = findViewById(R.id.best_course);
 
         submit_btn.setOnClickListener(this);
+
+        getData();
     }
 
     private void insertIntoTable(int id, String name, int grade) {
