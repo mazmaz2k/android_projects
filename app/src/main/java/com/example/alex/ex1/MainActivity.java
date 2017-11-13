@@ -31,10 +31,10 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, Chro
     private TextView txtExercise, txtTotalRightAnswers;
     private EditText editTxt;
     private String exerciseString;
-    private Random rand;
-    private int rightAnswer;
-    private int totalRightAnswers;
-    private long chronometer_saved_time;
+    private Random rand;            // Random number 1 - 15.
+    private int rightAnswer;        // Right answer of the exercise.
+    private int totalRightAnswers;  // Counter for user's good answers.
+    private long chronometer_saved_time;    // Save the time when the app gone background.
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,7 +57,10 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, Chro
         totalRightAnswers = 0;
         exerciseString = "";
 
+        // Start the count down of the chronometer.
         initChronometer();
+
+        // Set the next exercise
         setExercise();
 
     }
@@ -118,18 +121,19 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, Chro
     @Override
     protected void onRestart() {
         super.onRestart();
-        if(chronometer_saved_time > 0) {
-            restart();
+        if(chronometer_saved_time > 0) {    // If the game is over.
+            restart();                      // Restart the game.
         }
     }
 
+    // On each tick of the chronometer we change the background color relative on left time.
     @Override
     public void onChronometerTick(Chronometer chronometer) {
-        if(SystemClock.elapsedRealtime() - chronometer.getBase() > 0) {
-            gameOver();
-        } else if(SystemClock.elapsedRealtime() - chronometer.getBase() > -RED_ALERT_VAL * 1000) {
+        if(SystemClock.elapsedRealtime() - chronometer.getBase() > 0) {     // 0 Seconds Left
+            gameOver();                                                     // Game over, goes to the high score activity.
+        } else if(SystemClock.elapsedRealtime() - chronometer.getBase() > -RED_ALERT_VAL * 1000) {      // 10 Seconds Left.
             changeScreenColor(Color.RED);
-        } else if(SystemClock.elapsedRealtime() - chronometer.getBase() > -YELLOW_ALERT_VAL * 1000){
+        } else if(SystemClock.elapsedRealtime() - chronometer.getBase() > -YELLOW_ALERT_VAL * 1000){    // 30 Seconds Left.
             changeScreenColor(Color.YELLOW);
 
         }
@@ -139,6 +143,7 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, Chro
         layout.setBackgroundColor(color);
     }
 
+    // Game over - set the game data and goes to high score activity.
     private void gameOver() {
         chronometer.stop();
         SimpleDateFormat date = new SimpleDateFormat("dd/MM/YYYY 'at' hh:mm:ss", Locale.US);
@@ -150,6 +155,7 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, Chro
         startActivity(intent);
     }
 
+    // Easter Egg - Click on the score opens youtube activity.
     @Override
     public void onClick(View v) {
         if(v.getId() == R.id.totalRightAnswersTxt) {
@@ -162,14 +168,15 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, Chro
         }
     }
 
+    // Init all the game parameters, time, exercises, right answers, and start the game again.
     private void restart() {
         changeScreenColor(Color.TRANSPARENT);
         editTxt.setText("");
         totalRightAnswers = 0;
         chronometer_saved_time = 0;
         rightAnswer = 0;
-        initChronometer();
-        setExercise();
-        updateView(totalRightAnswers);
+        initChronometer();      // Start the timer From 60 Seconds.
+        setExercise();          // Set the new exercise.
+        updateView(totalRightAnswers);  // Update the screen.
     }
 }

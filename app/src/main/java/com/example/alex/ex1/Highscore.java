@@ -16,11 +16,13 @@ public class Highscore extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_highscore);
+
         high_scores_txt = findViewById(R.id.high_scores);
 
         DBHelper dbHelper = new DBHelper(this);
         Intent intent = getIntent();
 
+        // Getting date and score from intent.
         String date = intent.getStringExtra("date");
         int score = intent.getIntExtra("score", 0);
 
@@ -32,20 +34,27 @@ public class Highscore extends AppCompatActivity {
         values.put(Constants.Score.COL_DATE, date);
         values.put(Constants.Score.COL_SCORE, score);
 
+        // Insert into the table.
         db.insert(Constants.Score.TABLE_NAME, null, values);
 
+        // Read exists data from database and append it to the text view.
         readFromDB(db);
 
         db.close();
     }
 
     private void readFromDB(SQLiteDatabase db) {
+        // Select * From Table
         Cursor c = db.query(Constants.Score.TABLE_NAME, null, null, null, null, null, null);
         c.moveToFirst();
+        // Making a string.
         StringBuilder info = new StringBuilder("");
+
+        // Getting the indexes of the columns.
         int index_date = c.getColumnIndex(Constants.Score.COL_DATE);
         int index_score = c.getColumnIndex(Constants.Score.COL_SCORE);
 
+        // Append the data to String and then to the text view.
         do {
             info.append(c.getString(index_date));
             info.append(" |------| ");
