@@ -29,10 +29,10 @@ public class Highscore extends AppCompatActivity {
 
         // Create a new map of values, where column names are the keys.
         ContentValues values = new ContentValues();
-        values.put(DBHelper.COL_DATE, date);
-        values.put(DBHelper.COL_SCORE, score);
+        values.put(Constants.Score.COL_DATE, date);
+        values.put(Constants.Score.COL_SCORE, score);
 
-        db.insert(DBHelper.TABLE_NAME, null, values);
+        db.insert(Constants.Score.TABLE_NAME, null, values);
 
         readFromDB(db);
 
@@ -40,11 +40,11 @@ public class Highscore extends AppCompatActivity {
     }
 
     private void readFromDB(SQLiteDatabase db) {
-        Cursor c = db.query(DBHelper.TABLE_NAME, null, null, null, null, null, null);
+        Cursor c = db.query(Constants.Score.TABLE_NAME, null, null, null, null, null, null);
         c.moveToFirst();
         StringBuilder info = new StringBuilder("");
-        int index_date = c.getColumnIndex(DBHelper.COL_DATE);
-        int index_score = c.getColumnIndex(DBHelper.COL_SCORE);
+        int index_date = c.getColumnIndex(Constants.Score.COL_DATE);
+        int index_score = c.getColumnIndex(Constants.Score.COL_SCORE);
 
         do {
             info.append(c.getString(index_date));
