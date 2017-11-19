@@ -16,13 +16,13 @@
         android:layout_marginTop="8dp"
         android:width="60pt"
         android:hint="@string/course_id"
+        android:inputType="number"
+        android:maxLength="9"
         app:layout_constraintBottom_toTopOf="@+id/course_name_edit_text"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.2"
-        android:inputType="number"
-        android:maxLength="9"/>
+        app:layout_constraintVertical_bias="0.2" />
 
     <EditText
         android:id="@+id/course_name_edit_text"
@@ -38,8 +38,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.124"
-        />
+        app:layout_constraintVertical_bias="0.124" />
 
     <EditText
         android:id="@+id/course_grade_edit_text"
@@ -51,14 +50,13 @@
         android:layout_marginTop="8dp"
         android:width="60pt"
         android:hint="@string/course_grade"
+        android:inputType="number"
+        android:maxLength="9"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/course_name_edit_text"
-        app:layout_constraintVertical_bias="0.027"
-        android:inputType="number"
-        android:maxLength="9"
-        />
+        app:layout_constraintVertical_bias="0.027" />
 
     <Button
         android:id="@+id/submit_btn"
@@ -106,17 +104,21 @@
         app:layout_constraintTop_toBottomOf="@+id/best_course"
         app:layout_constraintVertical_bias="0.07" />
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/recyclerView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="134dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/avarage"
-        app:layout_constraintVertical_bias="0.0"
-        android:scrollbars="vertical"/>
+        app:layout_constraintTop_toBottomOf="@+id/avarage">
+
+        <ListView
+            android:id="@+id/listView"
+            android:layout_width="match_parent"
+            android:layout_height="144dp"
+            android:baselineAligned="false"
+            android:orientation="vertical" />
+    </LinearLayout>
 
 
 </android.support.constraint.ConstraintLayout>
