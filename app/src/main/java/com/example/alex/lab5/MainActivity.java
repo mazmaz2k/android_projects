@@ -5,10 +5,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
-import android.widget.Adapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -19,7 +16,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private EditText course_id, course_name, course_grade;
     private SQLiteDatabase db;
-    private TextView best_course, avarage;
+    private TextView best_course, average;
     private ListView listView;
 
     @Override
@@ -35,7 +32,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         course_grade = findViewById(R.id.course_grade_edit_text);
         Button submit_btn = findViewById(R.id.submit_btn);
         best_course = findViewById(R.id.best_course);
-        avarage = findViewById(R.id.avarage);
+        average = findViewById(R.id.average);
         best_course = findViewById(R.id.best_course);
         listView = findViewById(R.id.listView);
 
@@ -55,12 +52,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void getData() {
         Cursor c = this.db.query(Constants.Course.TABLE_NAME, new String[] {Constants.Course.COURSE_NAME +" ,MAX(" + Constants.Course.COURSE_GRADE +")"+ ", AVG(" + Constants.Course.COURSE_GRADE + ")"}, null, null,null,null, null);   // Select * From table
-        Cursor cursor = this.db.query(Constants.Course.TABLE_NAME,null,null,null,null,null,null);
+        Cursor cursor = this.db.query(Constants.Course.TABLE_NAME,null,null,null,null,null, Constants.Course.COURSE_NAME +" ASC");
         MyAdapter adapter = new MyAdapter(MainActivity.this, cursor);
         listView.setAdapter(adapter);
         c.moveToFirst();
-        best_course.setText("Best Course Is: " + c.getString(0) + "\nGrade is :" + c.getInt(1));
-        avarage.setText("The Avarage Is: " + c.getString(2));
+        best_course.setText("Course name: " + c.getString(0) + "\nHighest Grade:" + c.getInt(1));
+        average.setText("Average: " + c.getString(2));
         c.close();
     }
 

@@ -3,18 +3,20 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical">
+    android:orientation="horizontal">
 
     <TextView
         android:id="@+id/course_name"
         android:text="@string/course"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        />
+        android:textSize="20sp" />
 
     <TextView
         android:text="@string/grade"
         android:id="@+id/course_grade"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:textSize="20sp"/>
+
 </LinearLayout>
