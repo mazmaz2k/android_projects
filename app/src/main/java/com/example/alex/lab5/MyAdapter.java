@@ -26,17 +26,26 @@ public class MyAdapter extends CursorAdapter {
 
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
+
+        int indexName = cursor.getColumnIndex(Constants.Course.COURSE_NAME);
+        int indexGrade = cursor.getColumnIndex(Constants.Course.COURSE_GRADE);
+
+        int gradeNumber = Integer.parseInt(cursor.getString(indexGrade));
+
+        if(gradeNumber > 90) {
+            view.setBackgroundColor(Color.GREEN);
+        } else if (gradeNumber < 55) {
+            view.setBackgroundColor(Color.RED);
+        } else{
+            view.setBackgroundColor(Color.TRANSPARENT);
+        }
+
         TextView name = view.findViewById(R.id.course_name);
         TextView grade = view.findViewById(R.id.course_grade);
 
-        name.setText("Course Name: " + cursor.getString(cursor.getColumnIndex(Constants.Course.COURSE_NAME)));
-        grade.setText(" Course Grade: " + cursor.getString(cursor.getColumnIndex(Constants.Course.COURSE_GRADE)));
+        name.setText("Course Name: " + cursor.getString(indexName));
+        grade.setText(" Course Grade: " + cursor.getString(indexGrade));
 
-        if(Integer.parseInt(cursor.getString(cursor.getColumnIndex(Constants.Course.COURSE_GRADE))) > 90) {
-            view.setBackgroundColor(Color.GREEN);
-        } else if (Integer.parseInt(cursor.getString(cursor.getColumnIndex(Constants.Course.COURSE_GRADE))) < 55) {
-            view.setBackgroundColor(Color.RED);
-        }
     }
 }
 
