@@ -14,7 +14,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL("CREATE TABLE " + Constants.Course.TABLE_NAME + " (" + Constants.Course._ID + " NUMBER PRIMARY KEY, " + Constants.Course.COURSE_ID +" NUMBER, " + Constants.Course.COURSE_NAME + " TEXT, " + Constants.Course.COURSE_GRADE + " NUMBER)");
+        db.execSQL("CREATE TABLE " + Constants.Course.TABLE_NAME + " (" + Constants.Course._ID + " NUMBER PRIMARY KEY, " + Constants.Course.COURSE_ID +" NUMBER UNIQUE, " + Constants.Course.COURSE_NAME + " TEXT, " + Constants.Course.COURSE_GRADE + " NUMBER)");
     }
 
     @Override
