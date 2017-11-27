@@ -4,4 +4,5 @@
     <string name="longitude">Longitude</string>
     <string name="submit">Submit</string>
     <string name="phone">Phone Number</string>
+    <string name="_972">+972</string>
 </resources>
