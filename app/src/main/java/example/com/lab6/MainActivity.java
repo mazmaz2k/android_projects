@@ -30,6 +30,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     private Button btnSubmit;
     private TextView txtShow;
     private LocationRequest mLocationRequest;
+    private boolean firstRun;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +44,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         txtShow = findViewById(R.id.txt_send);
 
         txtShow.setText("");
+        firstRun = true;
 
         btnSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -51,6 +53,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                     Toast.makeText(MainActivity.this, "Please fill all the fields!", Toast.LENGTH_SHORT).show();
                     return;
                 }
+
                 double longitude = Double.parseDouble(editTextLongitude.getText().toString());
                 double latitude = Double.parseDouble(editTextLatitude.getText().toString());
 
@@ -68,17 +71,17 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             }
         });
 
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-                ActivityCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.SEND_SMS, Manifest.permission.READ_PHONE_STATE}, MY_CODE_REQUEST);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
+                ActivityCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED ||
+                ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED){
+                    ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.SEND_SMS, Manifest.permission.READ_PHONE_STATE}, MY_CODE_REQUEST);
         }
-        // Permission Granted.
-        buildGoogleApi();
         createLocationRequest();
+        buildGoogleApi();
     }
 
     private void startLocationUpdate() {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
         LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
@@ -120,10 +123,15 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         switch (requestCode) {
             case MY_CODE_REQUEST:
-                if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    buildGoogleApi();
-                } else {
-                    finish();
+                if(grantResults.length < 2 ||
+                        grantResults[0] != PackageManager.PERMISSION_GRANTED ||
+                        grantResults[1] != PackageManager.PERMISSION_GRANTED ||
+                        grantResults[2] != PackageManager.PERMISSION_GRANTED) {
+                    btnSubmit.setEnabled(false);
+                    Toast.makeText(this, "You must to allow all the permissions to fully use of the application.", Toast.LENGTH_LONG).show();
+                }
+                if(grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    displayLocation();
                 }
                 break;
 
@@ -139,7 +147,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
-        displayLocation();
+        if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            displayLocation();
+        }
     }
 
     @Override
@@ -156,7 +166,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         {
             distanceMoved = location.distanceTo(myLocation);
         }
-        if(distanceMoved >= 10) {
+        if(distanceMoved >= 10 || firstRun) {
+            if(firstRun)
+                firstRun = false;
             sendSMS();
         } else {
             Toast.makeText(this, "Distance is not changed over 10 meters", Toast.LENGTH_SHORT).show();
@@ -180,8 +192,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             Location lastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
             if(lastLocation != null) {
                 myLocation = lastLocation;
-            } else {
-                Toast.makeText(this,"Please make sure the permission is granted", Toast.LENGTH_SHORT).show();
             }
         }
     }
