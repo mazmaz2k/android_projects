@@ -10,12 +10,11 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.telephony.SmsManager;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
-
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
@@ -29,6 +28,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     private Location myLocation, friendLocation;
     private EditText editTextLongitude, editTextLatitude, editTextPhone;
     private Button btnSubmit;
+    private TextView txtShow;
     private LocationRequest mLocationRequest;
 
     @Override
@@ -40,6 +40,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         editTextLatitude = findViewById(R.id.latitude);
         editTextPhone = findViewById(R.id.phone_number);
         btnSubmit = findViewById(R.id.Submit);
+        txtShow = findViewById(R.id.txt_send);
+
+        txtShow.setText("");
 
         btnSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -140,14 +143,10 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     }
 
     @Override
-    public void onConnectionSuspended(int i) {
-
-    }
+    public void onConnectionSuspended(int i) {}
 
     @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-        Log.d("temp", "Error " + connectionResult.toString());
-    }
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {}
 
 
     @Override
@@ -157,23 +156,23 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         {
             distanceMoved = location.distanceTo(myLocation);
         }
-        Log.d("temp", distanceMoved + "");
         if(distanceMoved >= 10) {
             sendSMS();
         } else {
-            Toast.makeText(this, "Distance is not chanched over 10 meters", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Distance is not changed over 10 meters", Toast.LENGTH_SHORT).show();
         }
 
         myLocation = location;
     }
 
     private void sendSMS() {
-        final String message = "I'm " + myLocation.distanceTo(friendLocation) + " meters from you!";
+        final double distance = myLocation.distanceTo(friendLocation);
+        final String message = "I'm " + distance + " meters from you!";
         final String phoneNumber = editTextPhone.getText().toString();
         SmsManager sms = SmsManager.getDefault();
         sms.sendTextMessage("+972" + phoneNumber, null, message, null, null);
-        Toast.makeText(this, "SMS Sended!", Toast.LENGTH_SHORT).show();
-
+        Toast.makeText(this, "SMS Sent!", Toast.LENGTH_SHORT).show();
+        txtShow.setText(String.valueOf(distance));
     }
 
     private void displayLocation() {
@@ -186,6 +185,4 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             }
         }
     }
-
-
 }
