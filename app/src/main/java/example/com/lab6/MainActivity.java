@@ -92,8 +92,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         super.onPause();
     }
 
-
-
     private void createLocationRequest() {
         mLocationRequest = new LocationRequest();
         mLocationRequest.setInterval(60000);
@@ -134,21 +132,25 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                     displayLocation();
                 }
                 break;
-
         }
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        if(mGoogleApiClient != null)
+        if(mGoogleApiClient != null) {
+            LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
             mGoogleApiClient.disconnect();
+        }
     }
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
         if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             displayLocation();
+        }
+        if(!firstRun) {
+            startLocationUpdate();
         }
     }
 
