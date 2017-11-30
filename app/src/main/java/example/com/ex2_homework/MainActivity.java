@@ -65,7 +65,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         else {  // There are all needed permissions.
             cellInfo = telephonyManager.getAllCellInfo().get(0);   //This will give info of all sims present inside your mobile
         }
-        list = findViewById(R.id.list_view);
+        list = findViewById(R.id.listView);
         DBHelper dbHelper = new DBHelper(this);
         database = dbHelper.getWritableDatabase();
 
