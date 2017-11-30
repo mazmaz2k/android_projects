@@ -3,6 +3,7 @@ package example.com.ex2_homework;
 import android.Manifest;
 import android.content.ContentValues;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.location.Location;
 import android.support.annotation.NonNull;
@@ -16,7 +17,8 @@ import android.telephony.CellInfoGsm;
 import android.telephony.CellInfoLte;
 import android.telephony.CellInfoWcdma;
 import android.telephony.TelephonyManager;
-import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -31,8 +33,9 @@ import java.util.Calendar;
 import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener, LocationListener {
+        GoogleApiClient.OnConnectionFailedListener, LocationListener, View.OnClickListener {
 
+    public final int QUERY_INTERVAL = 60000;
     public final int PERMISSION_CODE_REQUEST = 15978;
     private SQLiteDatabase database;
     private ListView list;
@@ -42,11 +45,19 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     private GoogleApiClient googleApiClient;
     private Location myLocation;
     private LocationRequest locationRequest;
+    private Cursor cursor;
+    private Button btn_sort_by_date, btn_sort_by_asu;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        btn_sort_by_asu = findViewById(R.id.btn_sort_by_asu);
+        btn_sort_by_date = findViewById(R.id.btn_sort_by_date);
+
+        btn_sort_by_date.setOnClickListener(this);
+        btn_sort_by_asu.setOnClickListener(this);
 
         telephonyManager = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
         if (telephonyManager == null) {
@@ -69,28 +80,24 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         DBHelper dbHelper = new DBHelper(this);
         database = dbHelper.getWritableDatabase();
 
+        cursor = database.query(Constants.ASU.TABLE_NAME, null, null, null, null, null,null,null);
+        adapter = new MyAdapter(this, cursor);
 
-//        int asuLevel = getAsuLevel(cellInfo);
-//
-//        insertData("123","321", getDate(), asuLevel);
-//
-//
-//        Cursor c = database.query(Constants.ASU.TABLE_NAME, null, null, null, null, null,null,null);
-//
-//        Log.d("temp", c.getCount() + "");
-//        adapter = new MyAdapter(this, c);
-//
-//        list.setAdapter(adapter);
+        list.setAdapter(adapter);
         if (googleApiClient == null) {
             buildGoogleApi();
         }
         createLocationRequest();
+        if(cursor.getCount() != 0) {
+            btn_sort_by_date.setEnabled(true);
+            btn_sort_by_asu.setEnabled(true);
+        }
     }
 
     private void createLocationRequest() {
         locationRequest = new LocationRequest();
-        locationRequest.setInterval(10000);
-        locationRequest.setFastestInterval(10000);
+        locationRequest.setInterval(QUERY_INTERVAL);
+        locationRequest.setFastestInterval(QUERY_INTERVAL);
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
     }
 
@@ -132,6 +139,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 if (permissions.length > 0 && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                     Toast.makeText(MainActivity.this, "Permission granted.", Toast.LENGTH_LONG).show();
                     cellInfo = telephonyManager.getAllCellInfo().get(0);   //This will give info of all sims present inside your mobile
+                    LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest, this);
                 } else {
                     Toast.makeText(MainActivity.this, "Permission denied.\nThe application may not work properly!", Toast.LENGTH_LONG).show();
                 }
@@ -174,7 +182,15 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
     @Override
     public void onLocationChanged(Location location) {
-        Log.d("temp", location.getLatitude() + "-" + location.getLongitude());
+        double latitude = location.getLatitude();
+        double longitude = location.getLongitude();
+        insertData(String.valueOf(latitude), String.valueOf(longitude), getDate(), getAsuLevel(cellInfo));
+        cursor.requery();
+        adapter.notifyDataSetChanged();
+        if(cursor.getCount() != 0) {
+            btn_sort_by_asu.setEnabled(true);
+            btn_sort_by_date.setEnabled(true);
+        }
     }
 
     @Override
@@ -198,4 +214,39 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         super.onDestroy();
         database.close();
     }
+
+    public void removeRow(int _id) {
+        database.delete(Constants.ASU.TABLE_NAME, Constants.ASU._ID + " = ?", new String[] {String.valueOf(_id)});
+        cursor.requery();
+        adapter.notifyDataSetChanged();
+        if(cursor.getCount() == 0) {
+            btn_sort_by_date.setEnabled(false);
+            btn_sort_by_asu.setEnabled(false);
+        }
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.btn_sort_by_date:
+                sortByDate();
+                break;
+            case R.id.btn_sort_by_asu:
+                sortByAsu();
+                break;
+        }
+    }
+
+    private void sortByDate() {
+        cursor = database.query(Constants.ASU.TABLE_NAME, null, null, null, null, null, Constants.ASU.DATE + " DESC");
+        adapter = new MyAdapter(this, cursor);
+        list.setAdapter(adapter);
+    }
+
+    private void sortByAsu() {
+        cursor = database.query(Constants.ASU.TABLE_NAME, null, null, null, null, null, Constants.ASU.ASU + " DESC");
+        adapter = new MyAdapter(this, cursor);
+        list.setAdapter(adapter);
+    }
+
 }

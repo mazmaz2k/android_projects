@@ -24,7 +24,7 @@
             style="?android:attr/button"/>
 
         <Button
-            android:id="@+id/btn_sort_by_power"
+            android:id="@+id/btn_sort_by_asu"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/sort_by_asu"

@@ -8,11 +8,11 @@ final class Constants {
     static final String DB_NAME = "ASU_table.db";
     static final String CREATE_SQL_TABLE = "CREATE TABLE " +
             Constants.ASU.TABLE_NAME + " (" +
-            Constants.ASU._ID + " NUMBER PRIMARY KEY, " +
+            Constants.ASU._ID + " INTEGER PRIMARY KEY, " +
             Constants.ASU.LATITUDE + " TEXT, " +
             Constants.ASU.LONGITUDE + " TEXT, " +
             Constants.ASU.DATE + " TEXT, " +
-            Constants.ASU.ASU + " TEXT)";
+            Constants.ASU.ASU + " INTEGER)";
 
     static final String REMOVE_SQL_TABLE = "DROP TABLE IF EXISTS " + Constants.ASU.TABLE_NAME;
 
