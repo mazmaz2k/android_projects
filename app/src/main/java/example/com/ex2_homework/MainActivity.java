@@ -36,6 +36,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         GoogleApiClient.OnConnectionFailedListener, LocationListener, View.OnClickListener {
 
     public final int QUERY_INTERVAL = 60000;
+    public final int QUERY_FAST_INTERVAL = 1000;
     public final int PERMISSION_CODE_REQUEST = 15978;
     private SQLiteDatabase database;
     private ListView list;
@@ -97,7 +98,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     private void createLocationRequest() {
         locationRequest = new LocationRequest();
         locationRequest.setInterval(QUERY_INTERVAL);
-        locationRequest.setFastestInterval(QUERY_INTERVAL);
+        locationRequest.setFastestInterval(QUERY_FAST_INTERVAL);
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
     }
 
@@ -182,6 +183,10 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
     @Override
     public void onLocationChanged(Location location) {
+        if(myLocation != null && myLocation.distanceTo(location) < 10) { // Moved less than 10 meters.
+            return;
+        }
+        myLocation = location;
         double latitude = location.getLatitude();
         double longitude = location.getLongitude();
         insertData(String.valueOf(latitude), String.valueOf(longitude), getDate(), getAsuLevel(cellInfo));
@@ -212,6 +217,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        cursor.close();
         database.close();
     }
 
