@@ -17,6 +17,7 @@ import android.telephony.CellInfoGsm;
 import android.telephony.CellInfoLte;
 import android.telephony.CellInfoWcdma;
 import android.telephony.TelephonyManager;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
@@ -183,7 +184,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
     @Override
     public void onLocationChanged(Location location) {
-        if(myLocation != null && myLocation.distanceTo(location) < 10) { // Moved less than 10 meters.
+        if(myLocation == null || myLocation.distanceTo(location) < 10) { // Moved less than 10 meters.
+            Log.d("temp", myLocation.distanceTo(location) + "<- the location is ");
             return;
         }
         myLocation = location;
