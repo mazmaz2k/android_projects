@@ -17,18 +17,15 @@ import android.telephony.CellInfoGsm;
 import android.telephony.CellInfoLte;
 import android.telephony.CellInfoWcdma;
 import android.telephony.TelephonyManager;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
-
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
-
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
@@ -36,9 +33,12 @@ import java.util.Locale;
 public class MainActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, LocationListener, View.OnClickListener {
 
-    public final int QUERY_INTERVAL = 60000;
-    public final int QUERY_FAST_INTERVAL = 1000;
+    public final int LOCATION_DISTANCE = 10;    // Meters
+    public final int TIME_OF_LOCATION_CHANGE = 60000;   // Milliseconds
+    public final int QUERY_INTERVAL = 1000;  // Milliseconds
+    public final int QUERY_FAST_INTERVAL = 1000;    // Milliseconds
     public final int PERMISSION_CODE_REQUEST = 15978;
+
     private SQLiteDatabase database;
     private ListView list;
     private MyAdapter adapter;
@@ -157,10 +157,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         values.put(Constants.ASU.DATE, date);
         values.put(Constants.ASU.ASU, asuLevel);
         long returnValue = database.insert(Constants.ASU.TABLE_NAME, null, values);
-        if (returnValue != -1) {
-            Toast.makeText(this, "Database updated successfully!", Toast.LENGTH_SHORT).show();
-        } else {
-            Toast.makeText(this, "Something gone wrong!", Toast.LENGTH_SHORT).show();
+        if (returnValue == -1) {
+            Toast.makeText(this, "Something gone wrong!", Toast.LENGTH_LONG).show();
         }
     }
 
@@ -184,9 +182,10 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
     @Override
     public void onLocationChanged(Location location) {
-        if(myLocation == null || myLocation.distanceTo(location) < 10) { // Moved less than 10 meters.
-            Log.d("temp", myLocation.distanceTo(location) + "<- the location is ");
-            return;
+        if(myLocation != null && myLocation.distanceTo(location) < LOCATION_DISTANCE) { // Moved less than 10 meters.
+            if(location.getTime() - myLocation.getTime() < TIME_OF_LOCATION_CHANGE) {   // if we didn't pass 10 meters and not pass 1 minute.
+                return;
+            }
         }
         myLocation = location;
         double latitude = location.getLatitude();
