@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Lab7</string>
+    <string name="tell_me_a_joke">GET JOKE</string>
 </resources>
