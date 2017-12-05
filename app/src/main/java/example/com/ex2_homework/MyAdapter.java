@@ -60,12 +60,14 @@ public class MyAdapter extends CursorAdapter {
     }
 
     private void setViewColor(View view, int asu) {
-        if(asu >= 0 && asu <= 33) {
+        if(asu >= 0 && asu <= 10) {
             view.setBackgroundColor(Color.RED);
-        } else if(asu >= 34 && asu <= 67) {
+        } else if(asu > 10 && asu <= 20) {
             view.setBackgroundColor(Color.YELLOW);
-        } else {
+        } else if(asu > 20 && asu <= 31){
             view.setBackgroundColor(Color.GREEN);
+        } else {
+            view.setBackgroundColor(Color.TRANSPARENT);
         }
     }
 }

@@ -33,10 +33,9 @@ import java.util.Locale;
 public class MainActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, LocationListener, View.OnClickListener {
 
-    public final int LOCATION_DISTANCE = 10;    // Meters
-    public final int TIME_OF_LOCATION_CHANGE = 60000;   // Milliseconds
-    public final int QUERY_INTERVAL = 1000;  // Milliseconds
-    public final int QUERY_FAST_INTERVAL = 1000;    // Milliseconds
+    public final int SMALLEST_DISPLACEMENT = 10;    // Meters
+    public final int QUERY_INTERVAL = 60000;  // Milliseconds
+    public final int QUERY_FAST_INTERVAL = 60000;    // Milliseconds
     public final int PERMISSION_CODE_REQUEST = 15978;
 
     private SQLiteDatabase database;
@@ -45,7 +44,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     private TelephonyManager telephonyManager;
     private CellInfo cellInfo;
     private GoogleApiClient googleApiClient;
-    private Location myLocation;
     private LocationRequest locationRequest;
     private Cursor cursor;
     private Button btn_sort_by_date, btn_sort_by_asu;
@@ -74,15 +72,22 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                     Manifest.permission.ACCESS_COARSE_LOCATION,
                     Manifest.permission.ACCESS_FINE_LOCATION
             }, PERMISSION_CODE_REQUEST);
-        }
-        else {  // There are all needed permissions.
-            cellInfo = telephonyManager.getAllCellInfo().get(0);   //This will give info of all sims present inside your mobile
+        } else {  // There are all needed permissions.
+            if (telephonyManager.getAllCellInfo().size() == 0) {
+                Toast.makeText(this, "No SIM found!", Toast.LENGTH_LONG).show();
+            } else {
+                cellInfo = telephonyManager.getAllCellInfo().get(0);   //This will give info of all sims present inside your mobile
+            }
         }
         list = findViewById(R.id.listView);
         DBHelper dbHelper = new DBHelper(this);
         database = dbHelper.getWritableDatabase();
 
-        cursor = database.query(Constants.ASU.TABLE_NAME, null, null, null, null, null,null,null);
+        cursor = database.query(Constants.ASU.TABLE_NAME, null, null, null, null, null, null, null);
+        if (cursor.getCount() != 0) {
+            btn_sort_by_date.setEnabled(true);
+            btn_sort_by_asu.setEnabled(true);
+        }
         adapter = new MyAdapter(this, cursor);
 
         list.setAdapter(adapter);
@@ -90,10 +95,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             buildGoogleApi();
         }
         createLocationRequest();
-        if(cursor.getCount() != 0) {
-            btn_sort_by_date.setEnabled(true);
-            btn_sort_by_asu.setEnabled(true);
-        }
     }
 
     private void createLocationRequest() {
@@ -101,6 +102,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         locationRequest.setInterval(QUERY_INTERVAL);
         locationRequest.setFastestInterval(QUERY_FAST_INTERVAL);
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        locationRequest.setSmallestDisplacement(SMALLEST_DISPLACEMENT);
     }
 
     private void buildGoogleApi() {
@@ -115,7 +117,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     /* Returns the asu level of the mobile phone. */
     private int getAsuLevel(CellInfo cellInfo) {
         int asuLevel = 0;
-        if (cellInfo instanceof CellInfoGsm) {
+        if(cellInfo == null)
+            return asuLevel;
+        else if (cellInfo instanceof CellInfoGsm) {
             asuLevel = ((CellInfoGsm) cellInfo).getCellSignalStrength().getAsuLevel();
         } else if (cellInfo instanceof CellInfoLte) {
             asuLevel = ((CellInfoLte) cellInfo).getCellSignalStrength().getAsuLevel();
@@ -140,7 +144,11 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             case PERMISSION_CODE_REQUEST:
                 if (permissions.length > 0 && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                     Toast.makeText(MainActivity.this, "Permission granted.", Toast.LENGTH_LONG).show();
-                    cellInfo = telephonyManager.getAllCellInfo().get(0);   //This will give info of all sims present inside your mobile
+                    if(telephonyManager.getAllCellInfo().size() == 0) {
+                        Toast.makeText(this, "No SIM found!", Toast.LENGTH_LONG).show();
+                    }else {
+                        cellInfo = telephonyManager.getAllCellInfo().get(0);   //This will give info of all sims present inside your mobile
+                    }
                     LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest, this);
                 } else {
                     Toast.makeText(MainActivity.this, "Permission denied.\nThe application may not work properly!", Toast.LENGTH_LONG).show();
@@ -168,7 +176,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
-        myLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
         LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest, this);
     }
 
@@ -182,12 +189,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
     @Override
     public void onLocationChanged(Location location) {
-        if(myLocation != null && myLocation.distanceTo(location) < LOCATION_DISTANCE) { // Moved less than 10 meters.
-            if(location.getTime() - myLocation.getTime() < TIME_OF_LOCATION_CHANGE) {   // if we didn't pass 10 meters and not pass 1 minute.
-                return;
-            }
-        }
-        myLocation = location;
+
         double latitude = location.getLatitude();
         double longitude = location.getLongitude();
         insertData(String.valueOf(latitude), String.valueOf(longitude), getDate(), getAsuLevel(cellInfo));
@@ -197,6 +199,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             btn_sort_by_asu.setEnabled(true);
             btn_sort_by_date.setEnabled(true);
         }
+
     }
 
     @Override
