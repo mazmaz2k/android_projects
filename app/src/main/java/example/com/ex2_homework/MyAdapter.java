@@ -14,17 +14,19 @@ public class MyAdapter extends CursorAdapter {
 
     private LayoutInflater inflater;
 
-
+    /* Constructor. */
     MyAdapter(Context context, Cursor c) {
         super(context, c, false);
         this.inflater = LayoutInflater.from(context);
     }
 
+    /* Create the new row view. */
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
         return inflater.inflate(R.layout.item_row, parent,false);
     }
 
+    /* Set the view data from the cursor row of the database. */
     @Override
     public void bindView(View view, final Context context, final Cursor cursor) {
         final int _id = cursor.getInt(cursor.getColumnIndex(Constants.ASU._ID));
@@ -59,6 +61,7 @@ public class MyAdapter extends CursorAdapter {
         setViewColor(view, cursor.getInt(cursor.getColumnIndex(Constants.ASU.ASU)));
     }
 
+    /* Set the background color upon on the asu level, GSM type - from 0 to 31. */
     private void setViewColor(View view, int asu) {
         if(asu >= 0 && asu <= 10) {
             view.setBackgroundColor(Color.RED);

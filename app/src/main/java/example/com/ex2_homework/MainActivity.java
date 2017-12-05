@@ -39,7 +39,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     public final int PERMISSION_CODE_REQUEST = 15978;
 
     private SQLiteDatabase database;
-    private ListView list;
     private MyAdapter adapter;
     private TelephonyManager telephonyManager;
     private CellInfo cellInfo;
@@ -59,7 +58,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         btn_sort_by_date.setOnClickListener(this);
         btn_sort_by_asu.setOnClickListener(this);
 
-        telephonyManager = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
+        telephonyManager = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);      // The the system data about the phone.
         if (telephonyManager == null) {
             Toast.makeText(this, "Something gone wrong!", Toast.LENGTH_LONG).show();
             return;
@@ -73,17 +72,18 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                     Manifest.permission.ACCESS_FINE_LOCATION
             }, PERMISSION_CODE_REQUEST);
         } else {  // There are all needed permissions.
-            if (telephonyManager.getAllCellInfo().size() == 0) {
-                Toast.makeText(this, "No SIM found!", Toast.LENGTH_LONG).show();
+            if (telephonyManager.getAllCellInfo().size() == 0) {        // Cannot read the cell data.
+                Toast.makeText(this, "Cell data not found!", Toast.LENGTH_LONG).show();
             } else {
                 cellInfo = telephonyManager.getAllCellInfo().get(0);   //This will give info of all sims present inside your mobile
             }
         }
-        list = findViewById(R.id.listView);
+        ListView list = findViewById(R.id.listView);
         DBHelper dbHelper = new DBHelper(this);
         database = dbHelper.getWritableDatabase();
 
         cursor = database.query(Constants.ASU.TABLE_NAME, null, null, null, null, null, null, null);
+        /* Enable buttons if the database is not empty. */
         if (cursor.getCount() != 0) {
             btn_sort_by_date.setEnabled(true);
             btn_sort_by_asu.setEnabled(true);
@@ -91,20 +91,24 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         adapter = new MyAdapter(this, cursor);
 
         list.setAdapter(adapter);
+
+        /* Connect to google API services. */
         if (googleApiClient == null) {
             buildGoogleApi();
         }
         createLocationRequest();
     }
 
+    /* Location connection settings. */
     private void createLocationRequest() {
         locationRequest = new LocationRequest();
-        locationRequest.setInterval(QUERY_INTERVAL);
+        locationRequest.setInterval(QUERY_INTERVAL);                        // Update the location every 60 seconds.
         locationRequest.setFastestInterval(QUERY_FAST_INTERVAL);
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        locationRequest.setSmallestDisplacement(SMALLEST_DISPLACEMENT);
+        locationRequest.setSmallestDisplacement(SMALLEST_DISPLACEMENT);     // Update the location if we moved over 10 meters.
     }
 
+    /* Connect to google API. */
     private void buildGoogleApi() {
         googleApiClient = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
@@ -187,15 +191,17 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         Toast.makeText(this, "Connection error!", Toast.LENGTH_SHORT).show();
     }
 
+    /* Insert the location into the database when changed. */
     @Override
     public void onLocationChanged(Location location) {
 
         double latitude = location.getLatitude();
         double longitude = location.getLongitude();
         insertData(String.valueOf(latitude), String.valueOf(longitude), getDate(), getAsuLevel(cellInfo));
-        cursor.requery();
-        adapter.notifyDataSetChanged();
-        if(cursor.getCount() != 0) {
+        cursor.close(); // free the cursor point memory.
+        cursor = database.query(Constants.ASU.TABLE_NAME, null, null, null, null, null, null);
+        adapter.changeCursor(cursor);   // update the adapter with new cursor.
+        if(cursor.getCount() != 0) {    // if the database is not empty enable the buttons.
             btn_sort_by_asu.setEnabled(true);
             btn_sort_by_date.setEnabled(true);
         }
@@ -224,12 +230,13 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         cursor.close();
         database.close();
     }
-
+    /* Remove one row with id _id from the database and update the list view. */
     public void removeRow(int _id) {
         database.delete(Constants.ASU.TABLE_NAME, Constants.ASU._ID + " = ?", new String[] {String.valueOf(_id)});
-        cursor.requery();
-        adapter.notifyDataSetChanged();
-        if(cursor.getCount() == 0) {
+        cursor.close();
+        cursor = database.query(Constants.ASU.TABLE_NAME, null, null, null, null, null, null);
+        adapter.changeCursor(cursor);
+        if(cursor.getCount() == 0) {    // if the database is empty disable the buttons.
             btn_sort_by_date.setEnabled(false);
             btn_sort_by_asu.setEnabled(false);
         }
@@ -247,16 +254,17 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         }
     }
 
+    /* Sort the list view by date */
     private void sortByDate() {
+        cursor.close();
         cursor = database.query(Constants.ASU.TABLE_NAME, null, null, null, null, null, Constants.ASU.DATE + " DESC");
-        adapter = new MyAdapter(this, cursor);
-        list.setAdapter(adapter);
+        adapter.swapCursor(cursor);
     }
 
+    /* Sort the list view by ASU level. */
     private void sortByAsu() {
+        cursor.close();
         cursor = database.query(Constants.ASU.TABLE_NAME, null, null, null, null, null, Constants.ASU.ASU + " DESC");
-        adapter = new MyAdapter(this, cursor);
-        list.setAdapter(adapter);
+        adapter.swapCursor(cursor);
     }
-
 }
