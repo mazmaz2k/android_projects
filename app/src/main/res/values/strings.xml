@@ -1,3 +1,6 @@
 <resources>
     <string name="app_name">Ex3_Homework</string>
+    <string name="send_sms">SEND SMS</string>
+    <string name="get_random_text">get random text</string>
+    <string name="friend_s_name">Friend\'s name</string>
 </resources>
