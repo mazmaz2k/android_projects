@@ -32,7 +32,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/send_sms"
-            style="?android:attr/button"/>
+            style="?android:attr/button"
+            android:enabled="false"/>
 
     </LinearLayout>
 
