@@ -62,10 +62,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         grantResults[1] == PackageManager.PERMISSION_GRANTED &&
                         grantResults[2] == PackageManager.PERMISSION_GRANTED) {
                     Toast.makeText(MainActivity.this, "Permission granted!", Toast.LENGTH_SHORT).show();
-                    getAllCallLogs();
                 } else {
                     Toast.makeText(MainActivity.this, "Permission denied!\nThe application may not work properly.", Toast.LENGTH_SHORT).show();
                 }
+                getAllCallLogs();
+
                 break;
         }
     }
@@ -143,11 +144,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
-    private class MyTask extends AsyncTask<String, Void, Void> {    // Background task thread.
+    private class MyTask extends AsyncTask<String, Void, String> {    // Background task thread.
 
         private ProgressBar bar;
         private TextView randomTxt;
-        private String quote = "";
 
         @Override
         protected void onPreExecute() { // Update the views
@@ -159,9 +159,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
 
         @Override
-        protected Void doInBackground(String... strings) {  // Get the quote from the URL.
+        protected String doInBackground(String... strings) {  // Get the quote from the URL.
 
             String json = getJSON(strings[0]);  // Rest JSON from URL.
+            String quote = "";
             try {
                 JSONObject object = new JSONObject(json);
                 Thread.sleep(500);
@@ -171,20 +172,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            return null;
+            return quote;
         }
 
         @Override
-        protected void onProgressUpdate(Void... values) {
-            super.onProgressUpdate(values);
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {  // Update the views after the job in background is done.
-            super.onPostExecute(aVoid);
+        protected void onPostExecute(String string) {  // Update the views after the job in background is done.
+            super.onPostExecute(string);
             Button sendSms = findViewById(R.id.sendSMSBtn);
             bar.setVisibility(View.INVISIBLE);
-            randomTxt.setText(quote);
+            randomTxt.setText(string);
             if(number != null) {
                 sendSms.setEnabled(true);
             }
